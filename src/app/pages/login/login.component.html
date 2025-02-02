@@ -1,0 +1,19 @@
+<form>
+    <mat-form-field>
+        <mat-label>Instance id</mat-label>
+        <input matInput id="instance-id">
+    </mat-form-field>
+
+    <br>
+
+    <mat-form-field>
+        <mat-label>Linkcode</mat-label>
+        <input matInput id="linkcode">
+    </mat-form-field>
+
+    <br>
+
+    <mat-checkbox [checked]="true" id="stay-logged-in">Stay logged in</mat-checkbox>
+    <button mat-flat-button color="secondary" (click)="onLogin()">Login</button>
+
+</form>
