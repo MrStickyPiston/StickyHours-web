@@ -1,22 +1,33 @@
 <form>
 
     @if (!route_instance) {
-        <mat-form-field>
+        <mat-form-field (keyup.enter)="submit()">
             <mat-label>Instance id</mat-label>
-            <input matInput id="instance-id" [(ngModel)]="instance" [ngModelOptions]="{standalone: true}">
+            <input matInput id="instance-id" [(ngModel)]="instance" [ngModelOptions]="{standalone: true}" required>
+
+            <button mat-icon-button matSuffix (click)="openInstanceidDialog()">
+                <mat-icon>help</mat-icon>
+            </button>
         </mat-form-field>
 
         <br>
+
+        <button mat-flat-button color="secondary" (click)="next()">Next</button>
+    } @else {
+
+        <mat-form-field (keydown.enter)="submit()">
+            <mat-label>Linkcode</mat-label>
+            <input matInput id="linkcode" type="password" [(ngModel)]="linkcode" [ngModelOptions]="{standalone: true}" required>
+
+            <button mat-icon-button matSuffix (click)="openLinkcodeDialog()">
+                <mat-icon>help</mat-icon>
+            </button>
+        </mat-form-field>
+
+        <br>
+
+        <mat-checkbox [checked]="true" id="stay-logged-in">Stay logged in</mat-checkbox>
+        <button mat-flat-button color="primary" (click)="submit()">Login</button>
     }
-
-    <mat-form-field>
-        <mat-label>Linkcode</mat-label>
-        <input matInput id="linkcode" type="password" [(ngModel)]="linkcode" [ngModelOptions]="{standalone: true}">
-    </mat-form-field>
-
-    <br>
-
-    <mat-checkbox [checked]="true" id="stay-logged-in">Stay logged in</mat-checkbox>
-    <button mat-flat-button color="secondary" (click)="onLogin()">Login</button>
 
 </form>
