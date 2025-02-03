@@ -1,14 +1,17 @@
 <form>
-    <mat-form-field>
-        <mat-label>Instance id</mat-label>
-        <input matInput id="instance-id" [disabled]="instance" [value]="instance">
-    </mat-form-field>
 
-    <br>
+    @if (!route_instance) {
+        <mat-form-field>
+            <mat-label>Instance id</mat-label>
+            <input matInput id="instance-id" [(ngModel)]="instance" [ngModelOptions]="{standalone: true}">
+        </mat-form-field>
+
+        <br>
+    }
 
     <mat-form-field>
         <mat-label>Linkcode</mat-label>
-        <input matInput id="linkcode">
+        <input matInput id="linkcode" type="password" [(ngModel)]="linkcode" [ngModelOptions]="{standalone: true}">
     </mat-form-field>
 
     <br>

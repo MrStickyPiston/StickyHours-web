@@ -7,6 +7,4 @@ import { MainComponent } from "./components/main/main.component";
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  title = 'StickyHours-web';
-}
+export class AppComponent {}
