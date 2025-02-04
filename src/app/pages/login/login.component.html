@@ -1,7 +1,7 @@
 <form>
 
     @if (!route_instance) {
-        <mat-form-field (keyup.enter)="submit()">
+        <mat-form-field>
             <mat-label>Instance id</mat-label>
             <input matInput id="instance-id" [(ngModel)]="instance" [ngModelOptions]="{standalone: true}" required>
 
@@ -26,7 +26,7 @@
 
         <br>
 
-        <mat-checkbox [checked]="true" id="stay-logged-in">Stay logged in</mat-checkbox>
+        <mat-checkbox [(ngModel)]="remember_token" [ngModelOptions]="{standalone: true}">Stay logged in</mat-checkbox>
         <button mat-flat-button color="primary" (click)="submit()">Login</button>
     }
 

@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card'; 
 import { MatChipsModule } from '@angular/material/chips'; 
-import { RouterOutlet } from '@angular/router';
+import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { UtilsService } from '../../services/utils/utils.service';
+import { ZermeloService } from '../../services/zermelo/zermelo.service';
 
 
 @Component({
@@ -12,4 +14,7 @@ import { RouterOutlet } from '@angular/router';
 })
 export class MainComponent {
 
+  route_instance!: string | null;
+
+  constructor(){}
 }

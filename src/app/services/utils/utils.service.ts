@@ -1,13 +1,14 @@
 import { Component, inject, Injectable } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UtilsService {
 
-  readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(MatDialog);
 
   constructor() { }
 
