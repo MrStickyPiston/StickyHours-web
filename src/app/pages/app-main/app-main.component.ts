@@ -23,12 +23,10 @@ export class AppMainComponent {
   async ngOnInit() {
     this.route_instance = this.route.snapshot.paramMap.get('instance_id')
 
-    this.zermelo.currentInstance = this.route_instance
-
     if (!await this.zermelo.isLoggedIn(this.route_instance!)){
       console.log("Not logged in on route, navigating to login page for this instance.")
       this.zermelo.clearToken(this.route_instance!)
-      this.router.navigate([this.route_instance])
+      this.router.navigate([this.route_instance, 'login'])
     } else {
       console.log(`Logged in on ${this.route_instance}`)
     }

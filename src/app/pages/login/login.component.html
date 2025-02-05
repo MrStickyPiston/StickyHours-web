@@ -3,7 +3,13 @@
     @if (!route_instance) {
         <mat-form-field>
             <mat-label>Instance id</mat-label>
-            <input matInput id="instance-id" [(ngModel)]="instance" [ngModelOptions]="{standalone: true}" required>
+            <input matInput id="instance-id" [(ngModel)]="instance" [ngModelOptions]="{standalone: true}" required [matAutocomplete]="auto">
+
+            <mat-autocomplete #auto="matAutocomplete">
+                @for (instance of instances; track instance) {
+                  <mat-option [value]="instance">{{instance}}</mat-option>
+                }
+            </mat-autocomplete>
 
             <button mat-icon-button matSuffix (click)="openInstanceidDialog()">
                 <mat-icon>help</mat-icon>

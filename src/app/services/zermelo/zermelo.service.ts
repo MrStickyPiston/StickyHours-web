@@ -13,8 +13,6 @@ export class ZermeloService {
     private utils: UtilsService
   ) { }
 
-  currentInstance: string | null = null
-
   private getApiUrl(instance: string, endpoint: string) {
     return `https://${instance}.zportal.nl/api/v3/${endpoint}`
   }
@@ -153,12 +151,38 @@ export class ZermeloService {
     return await this.checkToken(this.getToken(instance), instance)
   }
 
+  getInstances(): Set<string> {
+    return new Set(JSON.parse(localStorage.getItem('instances')!));
+  }
+
+  addInstance(instance: string) {
+    let instances = this.getInstances()
+    instances.add(instance)
+
+    localStorage.setItem(
+      'instances',
+      JSON.stringify(Array.from(instances))
+    )
+  }
+
+  clearInstance(instance: string) {
+    let instances = this.getInstances()
+    instances.delete(instance)
+
+    localStorage.setItem(
+      'instances',
+      JSON.stringify(Array.from(instances))
+    )
+  }
+
   clearToken(instance: string) {
     localStorage.removeItem(`token_${instance}`)
   }
 
   private setToken(instance: string, token: string) {
     localStorage.setItem(`token_${instance}`, token)
+
+    this.addInstance(instance)
   }
 
   private getToken(instance: string) {

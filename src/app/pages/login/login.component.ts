@@ -13,11 +13,12 @@ import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilsService } from '../../services/utils/utils.service';
 import { ZermeloService } from '../../services/zermelo/zermelo.service';
+import {MatAutocompleteModule} from '@angular/material/autocomplete'; 
 
 @Component({
   selector: 'app-login',
   imports: [MatFormFieldModule,
-    MatInputModule, MatButtonModule, MatCheckboxModule, FormsModule, MatIconModule],
+    MatInputModule, MatButtonModule, MatCheckboxModule, FormsModule, MatIconModule, MatAutocompleteModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -33,6 +34,7 @@ export class LoginComponent {
 
   private readonly route = inject(ActivatedRoute);
   route_instance!: string | null;
+  instances!: Set<string>;
 
   // ngModels
   instance!: string;
@@ -41,7 +43,7 @@ export class LoginComponent {
 
   async ngOnInit() {
     this.route_instance = this.route.snapshot.paramMap.get('instance_id')
-    this.zermelo.currentInstance = this.route_instance
+    this.instances = this.zermelo.getInstances()
 
     if (this.route_instance && !await this.zermelo.isValidInstance(this.route_instance!)) {
       console.error(`Invalid route_instance ${this.route_instance}. Navigating to homepage`)
@@ -82,7 +84,12 @@ export class LoginComponent {
       return
     } else {
       // login
-      this.zermelo.codeLogin(this.linkcode, this.route_instance!, this.remember_token)
+      if (await this.zermelo.codeLogin(this.linkcode, this.route_instance!, this.remember_token)) {
+        console.log("Succesfully logged in")
+        this.router.navigate([this.route_instance])
+      } else {
+        this.utils.notify("Invalid linkcode", "Login failed")
+      }
     }
 
   }
