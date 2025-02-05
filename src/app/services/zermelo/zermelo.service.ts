@@ -7,12 +7,14 @@ import { UtilsService } from '../utils/utils.service';
   providedIn: 'root'
 })
 export class ZermeloService {
+  // Basic functions and utility used for logging in, managing tokens and managing instances
 
   constructor(
     private http: HttpClient,
     private utils: UtilsService
   ) { }
 
+  // Urls
   private getApiUrl(instance: string, endpoint: string) {
     return `https://${instance}.zportal.nl/api/v3/${endpoint}`
   }
@@ -21,41 +23,7 @@ export class ZermeloService {
     return `https://${instance}.zportal.nl/`
   }
 
-  async isValidInstance(instance: string) {
-
-    const pattern: RegExp = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/;
-
-    if (!pattern.test(instance)) {
-      return false
-    }
-
-
-    // This will return 200 OK on an existing instance id, and 404 on any other instance id
-    let url = this.getApiUrl(instance, 'oauth/logout?access_token=null')
-
-    try {
-
-      return (await lastValueFrom(this.http.get(url, { observe: 'response', responseType: 'text' }))).ok
-
-    } catch (e) {
-      if (e instanceof HttpErrorResponse) {
-
-        if (e.status == 404) {
-          return false
-        }
-
-        this.utils.error(e, "instance id check http request", true)
-
-      } else if (e instanceof Error) {
-
-        this.utils.error(e, "instance id check", true)
-
-      }
-
-      return false;
-    }
-  }
-
+  // Login
   async codeLogin(code: string, instance: string, remember_token: boolean) {
 
     const data = new HttpParams().appendAll(
@@ -97,7 +65,6 @@ export class ZermeloService {
       return false
     }
   }
-
 
   async tokenLogin(token: string, instance: string) {
 
@@ -151,6 +118,42 @@ export class ZermeloService {
     return await this.checkToken(this.getToken(instance), instance)
   }
 
+  // Instances
+  async isValidInstance(instance: string) {
+
+    const pattern: RegExp = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/;
+
+    if (!pattern.test(instance)) {
+      return false
+    }
+
+
+    // This will return 200 OK on an existing instance id, and 404 on any other instance id
+    let url = this.getApiUrl(instance, 'oauth/logout?access_token=null')
+
+    try {
+
+      return (await lastValueFrom(this.http.get(url, { observe: 'response', responseType: 'text' }))).ok
+
+    } catch (e) {
+      if (e instanceof HttpErrorResponse) {
+
+        if (e.status == 404) {
+          return false
+        }
+
+        this.utils.error(e, "instance id check http request", true)
+
+      } else if (e instanceof Error) {
+
+        this.utils.error(e, "instance id check", true)
+
+      }
+
+      return false;
+    }
+  }
+
   getInstances(): Set<string> {
     return new Set(JSON.parse(localStorage.getItem('instances')!));
   }
@@ -175,6 +178,7 @@ export class ZermeloService {
     )
   }
 
+  // Tokens
   clearToken(instance: string) {
     localStorage.removeItem(`token_${instance}`)
   }
