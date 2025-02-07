@@ -2,6 +2,8 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { UtilsService } from '../utils/utils.service';
+import { User } from '../../types/user';
+import { SchoolFunctionSettings } from '../../types/school-function-settings';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +25,7 @@ export class ZermeloService {
     return `https://${instance}.zportal.nl/`
   }
 
-  // Login
+  // Account management
   async codeLogin(code: string, instance: string, remember_token: boolean) {
 
     const data = new HttpParams().appendAll(
@@ -37,10 +39,10 @@ export class ZermeloService {
     const url = this.getApiUrl(instance, 'oauth/token');
 
     try {
-      let json = (await lastValueFrom(this.http.post(url, data, { observe: 'response', responseType: 'json', headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded') }))).body as {access_token: string}
+      let json = (await lastValueFrom(this.http.post(url, data, { observe: 'response', responseType: 'json', headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded') }))).body as { access_token: string }
 
       return this.tokenLogin(json.access_token, instance)
-      
+
     } catch (e) {
       if (e instanceof HttpErrorResponse) {
 
@@ -60,7 +62,7 @@ export class ZermeloService {
         this.utils.notify('Could not reach the zermelo servers');
         return false
       }
-      
+
       this.utils.error(e as Error, "code login", true)
       return false
     }
@@ -116,6 +118,11 @@ export class ZermeloService {
 
   async isLoggedIn(instance: string) {
     return await this.checkToken(this.getToken(instance), instance)
+  }
+
+  async logout(instance: string) {
+    console.log(`Logging out ${instance}`)
+    // TODO: log out
   }
 
   // Instances
@@ -191,5 +198,59 @@ export class ZermeloService {
 
   private getToken(instance: string) {
     return localStorage.getItem(`token_${instance}`)
+  }
+
+  // Requests
+  buildHttpParams(instance: string, params: Record<string, string> = {}) {
+    return new HttpParams().append('access_token', this.getToken(instance)!).appendAll(params)
+  }
+
+  async sendGetRequest(instance: string, endpoint: string, params: HttpParams) {
+    const url = this.getApiUrl(instance, endpoint)
+
+    try {
+
+      return await lastValueFrom(this.http.get(url, { observe: 'response', params: params }))
+
+    } catch (err) {
+      const e = err as HttpErrorResponse
+
+      if (e.status == 401) {
+        // session expired
+        this.utils.notify("Your current session has been exipred. Please log in again", "Session expired")
+        this.logout(instance)
+
+        return null
+      } else {
+        throw e
+      }
+    }
+  }
+
+  // Account data
+  async getUser(instance: string): Promise<User> {
+    let r = await this.sendGetRequest(
+      instance,
+      'users/~me',
+      this.buildHttpParams(instance)
+    )
+
+    return (r?.body as {response: {data: [Object]}}).response.data[0] as User
+  }
+
+  async getSettings(instance: string): Promise<SchoolFunctionSettings | null> {
+    function getSchoolYear(){
+      const month = new Date().getMonth()
+
+      if (month < 8) {
+        return new Date().getFullYear() - 1
+      } else {
+        return new Date().getFullYear()
+      }
+    }
+
+    const user = await this.getUser(instance)
+
+    return ((await this.sendGetRequest(instance, 'schoolfunctionsettings', this.buildHttpParams(instance, {archived: 'false', year: getSchoolYear().toString(), schoolInSchoolYear: user.schoolInSchoolYears.map(String).join(',')})))?.body as {response: {data: [Object]}}).response.data[0] as SchoolFunctionSettings
   }
 }

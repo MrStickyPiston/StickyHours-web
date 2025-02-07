@@ -27,9 +27,12 @@ export class AppMainComponent {
       console.log("Not logged in on route, navigating to login page for this instance.")
       this.zermelo.clearToken(this.route_instance!)
       this.router.navigate([this.route_instance, 'login'])
+      return
     } else {
       console.log(`Logged in on ${this.route_instance}`)
     }
+
+    console.log(await this.zermelo.getSettings(this.route_instance!))
   }
 
 }
