@@ -1,3 +1,11 @@
 export interface SchoolFunctionSettings {
-    schoolInSchoolYearName: string
+    schoolInSchoolYear: string
+    schoolInSchoolYearName: string,
+
+    studentCanViewProjectSchedules: boolean,
+    employeeCanViewProjectSchedules: boolean,
+
+    employeeCanViewOwnSchedule: boolean,
+
+    studentCanViewProjectNames: boolean
 }

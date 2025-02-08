@@ -2,8 +2,11 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { UtilsService } from '../utils/utils.service';
-import { User } from '../../types/user';
 import { SchoolFunctionSettings } from '../../types/school-function-settings';
+import { Teacher } from '../../types/users/teacher';
+import { Student } from '../../types/users/student';
+import { User } from '../../types/users/user';
+import { ZermeloUser } from '../../types/zermelo-user';
 
 @Injectable({
   providedIn: 'root'
@@ -228,14 +231,14 @@ export class ZermeloService {
   }
 
   // Account data
-  async getUser(instance: string): Promise<User> {
+  async getUser(instance: string): Promise<ZermeloUser> {
     let r = await this.sendGetRequest(
       instance,
       'users/~me',
       this.buildHttpParams(instance)
     )
 
-    return (r?.body as {response: {data: [Object]}}).response.data[0] as User
+    return (r?.body as {response: {data: [Object]}}).response.data[0] as ZermeloUser
   }
 
   async getSettings(instance: string): Promise<SchoolFunctionSettings | null> {
@@ -252,5 +255,128 @@ export class ZermeloService {
     const user = await this.getUser(instance)
 
     return ((await this.sendGetRequest(instance, 'schoolfunctionsettings', this.buildHttpParams(instance, {archived: 'false', year: getSchoolYear().toString(), schoolInSchoolYear: user.schoolInSchoolYears.map(String).join(',')})))?.body as {response: {data: [Object]}}).response.data[0] as SchoolFunctionSettings
+  }
+
+  // Utils
+  async getSchedule(instance: string, weeks: number = 1) {
+    const user = await this.getUser(instance)
+    const settings = await this.getSettings(instance)
+
+    if (user.isStudent && !settings!.studentCanViewProjectSchedules) {
+      return null
+    } else if (!settings!.employeeCanViewProjectSchedules){
+      return null
+    }
+
+    let params = this.buildHttpParams(instance, {
+      'fields': 'groups,start,end,startTimeSlot,endTimeSlot,teachers',
+      'valid': 'true',
+      'cancelled': 'false'
+    })
+
+    if (user.isStudent) {
+      params = params.append('possibleStudents', user.code)
+    } else {
+      params = params.append('teachers', user.code)
+    }
+
+    // Date and time
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay(), 0, 0, 0, 0);
+    const end = new Date(start.getTime() + (6 + 7 * (weeks - 1)) * 24 * 60 * 60 * 1000);
+    end.setHours(23, 59, 59, 999);
+
+    params = params.appendAll({
+      'start': Math.floor(start.getTime() / 1000),
+      'end': Math.floor(end.getTime() / 1000)
+    })
+    
+    try {
+      return (( await this.sendGetRequest(instance, 'appointments', params))?.body as {response: {data: [Object]}}).response.data
+    } catch (err) {
+      const e = err as HttpErrorResponse
+
+      if (e.status == 403) {
+        this.utils.notify("Zermelo rejected the request. Please try again with less weeks and check if your schedule exists in the zermelo portal.", "Could not fetch schedule")
+        return null
+      }
+
+      throw err
+    }
+  }
+
+  async getUsers(instance: string){
+
+    const user = await this.getUser(instance)
+    const settings = await this.getSettings(instance)
+
+    if (user.isStudent && !settings!.studentCanViewProjectSchedules) {
+      return null
+    } else if (!settings!.employeeCanViewProjectSchedules || !settings!.employeeCanViewProjectSchedules){
+      return null
+    }
+
+    let student_params: HttpParams
+
+    const useStudentNames = (!user.isStudent && settings?.employeeCanViewOwnSchedule) || settings?.studentCanViewProjectNames
+
+    if ( useStudentNames ) {
+      student_params = this.buildHttpParams(instance, {
+        'schoolInSchoolYear': settings?.schoolInSchoolYear!,
+        'isStudent': 'true',
+        'fields': 'firstName,prefix,lastName,code'
+      })
+    } else {
+      student_params = this.buildHttpParams(instance, {
+        'schoolInSchoolYear': settings?.schoolInSchoolYear!,
+        'isStudent': 'true',
+        'fields': 'code'
+      })
+    }
+
+    const teacher_params = this.buildHttpParams(instance, {
+      'schoolInSchoolYear': settings?.schoolInSchoolYear!,
+      'isEmployee': 'true',
+      'fields': 'prefix,lastName,code'
+    })
+
+    let users: User[] = []
+    let students: Student[]
+    let teachers: Teacher[]
+
+    students = (( await this.sendGetRequest(instance, 'users', student_params))?.body as {response: {data: [Student]}}).response.data
+    teachers = (( await this.sendGetRequest(instance, 'users', teacher_params))?.body as {response: {data: [Teacher]}}).response.data
+
+    teachers.forEach((teacher: Teacher) => {
+      users.push(
+        {
+          name: teacher.prefix ? `${teacher.prefix} ${teacher.lastName}` : `${teacher.lastName}`,
+          code: teacher.code,
+          isTeacher: true
+        }
+      )
+    });
+
+    students.forEach((student: Student) => {
+      if (useStudentNames){
+        users.push(
+          {
+            name: student.prefix ? `${student.prefix} ${student.lastName}` : `${student.lastName}`,
+            code: student.code,
+            isTeacher: false
+          }
+        )
+      } else {
+        users.push(
+          {
+            name: student.code,
+            code: student.code,
+            isTeacher: false
+          }
+        )
+      }
+    });
+
+    return users
   }
 }

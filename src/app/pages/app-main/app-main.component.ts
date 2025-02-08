@@ -14,11 +14,11 @@ export class AppMainComponent {
   constructor(
       private zermelo: ZermeloService,
       private router: Router,
-      private utils: UtilsService
     ) { };
 
   private readonly route = inject(ActivatedRoute);
   route_instance!: string | null;
+  users!: string
 
   async ngOnInit() {
     this.route_instance = this.route.snapshot.paramMap.get('instance_id')
@@ -32,7 +32,7 @@ export class AppMainComponent {
       console.log(`Logged in on ${this.route_instance}`)
     }
 
-    console.log(await this.zermelo.getSettings(this.route_instance!))
+    console.log((await this.zermelo.getUsers(this.route_instance!)))
   }
 
 }
