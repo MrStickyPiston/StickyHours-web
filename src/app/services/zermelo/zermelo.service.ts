@@ -340,17 +340,18 @@ export class ZermeloService {
       'fields': 'prefix,lastName,code'
     })
 
-    let users: User[] = []
+    let users_students: User[] = []
+    let users_teachers: User[] = []
     let students: Student[]
     let teachers: Teacher[]
 
-    students = (( await this.sendGetRequest(instance, 'users', student_params))?.body as {response: {data: [Student]}}).response.data
+    students = (( await this.sendGetRequest(instance, 'users', student_params))?.body as {response: {data: [Student]}}).response.data    
     teachers = (( await this.sendGetRequest(instance, 'users', teacher_params))?.body as {response: {data: [Teacher]}}).response.data
 
     teachers.forEach((teacher: Teacher) => {
-      users.push(
+      users_teachers.push(
         {
-          name: teacher.prefix ? `${teacher.prefix} ${teacher.lastName}` : `${teacher.lastName}`,
+          name: teacher.prefix ? `${teacher.prefix} ${teacher.lastName} (${teacher.code})` : `${teacher.lastName} (${teacher.code})`,
           code: teacher.code,
           isTeacher: true
         }
@@ -359,15 +360,15 @@ export class ZermeloService {
 
     students.forEach((student: Student) => {
       if (useStudentNames){
-        users.push(
+        users_students.push(
           {
-            name: student.prefix ? `${student.prefix} ${student.lastName}` : `${student.lastName}`,
+            name: student.prefix ? `${student.firstName} ${student.prefix} ${student.lastName} (${student.code})` : `${student.firstName} ${student.lastName} (${student.code})`,
             code: student.code,
             isTeacher: false
           }
         )
       } else {
-        users.push(
+        users_students.push(
           {
             name: student.code,
             code: student.code,
@@ -376,6 +377,8 @@ export class ZermeloService {
         )
       }
     });
+
+    let users: User[] = [...users_teachers.sort((a, b) => a.name.localeCompare(b.name)), ... users_students.sort((a, b) => a.name.localeCompare(b.name))]
 
     return users
   }
