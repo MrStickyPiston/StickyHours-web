@@ -2,13 +2,19 @@ import { Injectable } from '@angular/core';
 import { Appointment } from '../../types/appointment/appointment';
 import { ProcessedAppointments, Timeslot } from '../../types/appointment/processed-appointment';
 import { Gap } from '../../types/appointment/gap';
+import { ZermeloService } from '../zermelo/zermelo.service';
+import { UtilsService } from '../utils/utils.service';
+import { User } from '../../types/users/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ZapiService {
 
-  constructor() { }
+  constructor(
+    private zermelo: ZermeloService,
+    private utils: UtilsService
+  ) { }
 
   isValidAppointment(appointment: Appointment, userId: string): boolean {
     if (!appointment.startTimeSlot || !appointment.endTimeSlot) {
@@ -66,7 +72,7 @@ export class ZapiService {
   }
 
 
-  getCommonGaps(data: ProcessedAppointments[], stickyHours: number = 0): { [date: string]: Gap[] } {
+  getCommonGaps(data: ProcessedAppointments[], stickyHours: number): { [date: string]: Gap[] } {
     const commonDates: Set<string> = new Set(
       data.reduce((acc, userData) => [...acc, ...userData.days], [] as string[])
     );
@@ -166,5 +172,38 @@ export class ZapiService {
     }
 
     return gaps;
+  }
+
+  async getCommonFreeHours(instance: string, users: User[], weeks: number, stickyHours: number) {
+    let processedAppointments: ProcessedAppointments[] = [];
+
+    for (const user of users) {
+      console.info(`Fetching ${user.code}`);
+
+      try {
+        const appointments = await this.zermelo.getSchedule(user, instance, weeks)
+
+        if (!appointments || Object.keys(appointments).length === 0) {
+          this.utils.notify("Please check if you can see your schedule in Zermelo.", "No appointments found")
+          return null
+        }
+
+        console.info(`Processing ${user.code}`);
+
+        const processedData = this.processUserData(appointments, user.code);
+        if (!processedData) {
+          this.utils.notify("Please check if you can see your schedule in Zermelo.", "No valid appointments found")
+          processedAppointments = [];
+          break;
+        }
+
+        processedAppointments.push(processedData);
+      } catch (error) {
+        this.utils.error(error as Error, `processing ${user.name}`, true);
+      }
+    }
+
+    return this.getCommonGaps(processedAppointments, stickyHours);
+
   }
 }

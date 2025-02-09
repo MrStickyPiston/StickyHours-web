@@ -25,7 +25,7 @@
 
     <mat-form-field>
         <mat-label>Period</mat-label>
-        <mat-select value="1" panelClass="panel">
+        <mat-select panelClass="panel" value="1" [(ngModel)]="weeks" [ngModelOptions]="{standalone: true}">
             <mat-option value="1">Only this week</mat-option>
             <mat-option value="2">From this week to next week</mat-option>
             <mat-option value="3">From this week to 2 weeks in the future</mat-option>
@@ -37,7 +37,7 @@
 
     <mat-form-field>
         <mat-label>Sticky Hours</mat-label>
-        <mat-select value="0" panelClass="panel">
+        <mat-select panelClass="panel" value="0" [(ngModel)]="stickyHours" [ngModelOptions]="{standalone: true}">
             <mat-option value="0">No Sticky Hours</mat-option>
             <mat-option value="1">1 Sticky Hour</mat-option>
             <mat-option value="2">2 Sticky Hours</mat-option>
@@ -45,5 +45,35 @@
         </mat-select>
     </mat-form-field>
 
-    <button mat-flat-button color="primary">Compute</button>
+    <button mat-flat-button color="primary" (click)="submit()">Compute</button>
 </form>
+
+@if (dates) {
+<mat-accordion>
+    @for (date of dates; track $index) {
+    <mat-expansion-panel hideToggle>
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ displayDatetime(date, {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long'
+                }) }}</mat-panel-title></mat-expansion-panel-header>
+
+
+        @for (gap of commonFreeHours![date]; track $index) {
+
+        @if (gap.start_slot != gap.end_slot) {
+        <p>{{ displayDatetime(gap.start_time * 1000, {timeStyle: 'short'}) }} - {{ displayDatetime(gap.end_time * 1000,
+            {timeStyle: 'short'}) }} (hour {{ gap.start_slot }} - {{ gap.end_slot }}, {{displayTimeDelta((gap.end_time -
+            gap.start_time))}})</p>
+        } @else {
+        <p>{{ displayDatetime(gap.start_time * 1000, {timeStyle: 'short'}) }} - {{ displayDatetime(gap.end_time * 1000,
+            {timeStyle: 'short'}) }} (hour {{ gap.start_slot }}, {{displayTimeDelta((gap.end_time - gap.start_time))}})
+        </p>
+        }
+
+        }
+    </mat-expansion-panel>
+    }
+</mat-accordion>
+}

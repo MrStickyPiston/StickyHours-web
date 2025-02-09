@@ -7,6 +7,7 @@ import { Teacher } from '../../types/users/teacher';
 import { Student } from '../../types/users/student';
 import { User } from '../../types/users/user';
 import { ZermeloUser } from '../../types/zermelo-user';
+import { Appointment } from '../../types/appointment/appointment';
 
 @Injectable({
   providedIn: 'root'
@@ -258,11 +259,11 @@ export class ZermeloService {
   }
 
   // Utils
-  async getSchedule(instance: string, weeks: number = 1) {
-    const user = await this.getUser(instance)
+  async getSchedule(user: User, instance: string, weeks: number) {
+    const zermeloUser = await this.getUser(instance)
     const settings = await this.getSettings(instance)
 
-    if (user.isStudent && !settings!.studentCanViewProjectSchedules) {
+    if (zermeloUser.isStudent && !settings!.studentCanViewProjectSchedules) {
       return null
     } else if (!settings!.employeeCanViewProjectSchedules){
       return null
@@ -274,7 +275,7 @@ export class ZermeloService {
       'cancelled': 'false'
     })
 
-    if (user.isStudent) {
+    if (!user.isTeacher) {
       params = params.append('possibleStudents', user.code)
     } else {
       params = params.append('teachers', user.code)
@@ -292,7 +293,7 @@ export class ZermeloService {
     })
     
     try {
-      return (( await this.sendGetRequest(instance, 'appointments', params))?.body as {response: {data: [Object]}}).response.data
+      return (( await this.sendGetRequest(instance, 'appointments', params))?.body as {response: {data: [Appointment]}}).response.data as Appointment[]
     } catch (err) {
       const e = err as HttpErrorResponse
 
