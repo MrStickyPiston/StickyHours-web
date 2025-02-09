@@ -63,12 +63,12 @@
         @for (gap of commonFreeHours![date]; track $index) {
 
         @if (gap.start_slot != gap.end_slot) {
-        <p>{{ displayDatetime(gap.start_time * 1000, {timeStyle: 'short'}) }} - {{ displayDatetime(gap.end_time * 1000,
-            {timeStyle: 'short'}) }} (hour {{ gap.start_slot }} - {{ gap.end_slot }}, {{displayTimeDelta((gap.end_time -
+        <p>Hour {{ gap.start_slot }} - {{ gap.end_slot }} ({{ displayDatetime(gap.start_time * 1000, {timeStyle: 'short'}) }} - {{ displayDatetime(gap.end_time * 1000,
+            {timeStyle: 'short'}) }}, {{displayTimeDelta((gap.end_time -
             gap.start_time))}})</p>
         } @else {
-        <p>{{ displayDatetime(gap.start_time * 1000, {timeStyle: 'short'}) }} - {{ displayDatetime(gap.end_time * 1000,
-            {timeStyle: 'short'}) }} (hour {{ gap.start_slot }}, {{displayTimeDelta((gap.end_time - gap.start_time))}})
+        <p>Hour {{ gap.start_slot }} ({{ displayDatetime(gap.start_time * 1000, {timeStyle: 'short'}) }} - {{ displayDatetime(gap.end_time * 1000,
+            {timeStyle: 'short'}) }}, {{displayTimeDelta((gap.end_time - gap.start_time))}})
         </p>
         }
 
