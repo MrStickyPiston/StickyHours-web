@@ -4,7 +4,7 @@
 
         <mat-chip-grid #chipGrid aria-label="User selection">
             @for (user of selectedUsers; track $index) {
-            <mat-chip-row (removed)="remove(user.code)">
+            <mat-chip-row (removed)="removeSelectedUser(user.code)">
                 {{user.name}}
                 <button matChipRemove [attr.aria-label]="'remove ' + user">
                     <mat-icon>cancel</mat-icon>
@@ -13,14 +13,37 @@
             }
         </mat-chip-grid>
 
-        <input name="user" #userInput [(ngModel)]="user" [matChipInputFor]="chipGrid"
-            [matAutocomplete]="auto" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+        <input name="user" #userInput [(ngModel)]="user" [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
             (input)="updateFilteredUsers()" />
 
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event); userInput.value = ''">
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="userSelected($event); userInput.value = ''">
             @for (user of filteredUsers; track user) {
             <mat-option [value]="user.code">{{user.name}}</mat-option>
             }
         </mat-autocomplete>
     </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Period</mat-label>
+        <mat-select value="1" panelClass="panel">
+            <mat-option value="1">Only this week</mat-option>
+            <mat-option value="2">From this week to next week</mat-option>
+            <mat-option value="3">From this week to 2 weeks in the future</mat-option>
+            <mat-option value="4">From this week to 3 weeks in the future</mat-option>
+            <mat-option value="5">From this week to 4 weeks in the future</mat-option>
+            <mat-option value="6">From this week to 5 weeks in the future</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Sticky Hours</mat-label>
+        <mat-select value="0" panelClass="panel">
+            <mat-option value="0">No Sticky Hours</mat-option>
+            <mat-option value="1">1 Sticky Hour</mat-option>
+            <mat-option value="2">2 Sticky Hours</mat-option>
+            <mat-option value="3">3 Sticky Hours</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <button mat-flat-button color="primary">Compute</button>
 </form>

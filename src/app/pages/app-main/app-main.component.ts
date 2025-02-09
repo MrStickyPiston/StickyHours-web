@@ -12,10 +12,11 @@ import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-app-main',
-  imports: [MatFormFieldModule, MatSelectModule, MatAutocompleteModule, FormsModule, MatInputModule, MatChipsModule, MatIconModule],
+  imports: [MatFormFieldModule, MatSelectModule, MatAutocompleteModule, FormsModule, MatInputModule, MatChipsModule, MatIconModule, MatButtonModule],
   templateUrl: './app-main.component.html',
   styleUrl: './app-main.component.scss'
 })
@@ -27,8 +28,6 @@ export class AppMainComponent {
     ) { };
 
   private readonly route = inject(ActivatedRoute)
-  readonly announcer = inject(LiveAnnouncer)
-  readonly separatorKeysCodes: number[] = [ENTER, COMMA]
 
   selectedUsers: User[] = []
 
@@ -65,22 +64,30 @@ export class AppMainComponent {
 
     this.allUsers = await this.zermelo.getUsers(this.route_instance!)
     this.updateFilteredUsers()
+
+    const zermeloUserCode = (await this.zermelo.getUser(this.route_instance!)).code
+    this.addSelectedUser(this.allUsers!.find(user => user.code === zermeloUserCode)!)
+    
   }
 
-  remove(userCode: string): void {
+  removeSelectedUser(userCode: string): void {
     this.selectedUsers = this.selectedUsers.filter(user => user.code !== userCode);
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
+  userSelected(event: MatAutocompleteSelectedEvent): void {
 
     const user = this.allUsers!.find(user => user.code === event.option.value)
 
     if (user) {
-      this.selectedUsers = [... this.selectedUsers, user]
+      this.addSelectedUser(user)
       this.user = '';
       event.option.deselect();
       this.updateFilteredUsers()
     }
+  }
+
+  addSelectedUser(user: User) {
+    this.selectedUsers = [... this.selectedUsers, user]
   }
 
 }
