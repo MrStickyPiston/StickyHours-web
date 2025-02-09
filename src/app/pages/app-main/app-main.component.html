@@ -25,7 +25,7 @@
 
     <mat-form-field>
         <mat-label>Period</mat-label>
-        <mat-select panelClass="panel" value="1" [(ngModel)]="weeks" [ngModelOptions]="{standalone: true}">
+        <mat-select panelClass="panel" value="1" [(value)]="weeks">
             <mat-option value="1">Only this week</mat-option>
             <mat-option value="2">From this week to next week</mat-option>
             <mat-option value="3">From this week to 2 weeks in the future</mat-option>
@@ -37,7 +37,7 @@
 
     <mat-form-field>
         <mat-label>Sticky Hours</mat-label>
-        <mat-select panelClass="panel" value="0" [(ngModel)]="stickyHours" [ngModelOptions]="{standalone: true}">
+        <mat-select panelClass="panel" value="0" [(value)]="stickyHours">
             <mat-option value="0">No Sticky Hours</mat-option>
             <mat-option value="1">1 Sticky Hour</mat-option>
             <mat-option value="2">2 Sticky Hours</mat-option>

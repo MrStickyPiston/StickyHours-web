@@ -1,9 +1,8 @@
-import { Component, computed, inject, model, Signal, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilsService } from '../../services/utils/utils.service';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatSelectModule } from '@angular/material/select';
-import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips';
 import { ZermeloService } from '../../services/zermelo/zermelo.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -11,12 +10,10 @@ import { User } from '../../types/users/user';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatButtonModule } from '@angular/material/button';
 import { ZapiService } from '../../services/zapi/zapi.service';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { Gap } from '../../types/appointment/gap';
-import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-app-main',
@@ -29,6 +26,7 @@ export class AppMainComponent {
   constructor(
     private zermelo: ZermeloService,
     private zapi: ZapiService,
+    private utils: UtilsService,
     private router: Router,
   ) { };
 
@@ -46,8 +44,8 @@ export class AppMainComponent {
 
   // ngModels
   user!: string
-  weeks: number = 1
-  stickyHours: number = 0
+  weeks: string = '1'
+  stickyHours: string = '0'
 
   // Output: the common free hours
   commonFreeHours!: { [date: string]: Gap[]; } | null
@@ -106,12 +104,16 @@ export class AppMainComponent {
 
   async submit() {
     console.log(`Computing common free hours for ${JSON.stringify(this.selectedUsers)}`)
-    this.commonFreeHours = await this.zapi.getCommonFreeHours(this.route_instance!, this.selectedUsers, this.weeks, this.stickyHours)
+    this.commonFreeHours = await this.zapi.getCommonFreeHours(this.route_instance!, this.selectedUsers, Number(this.weeks), Number(this.stickyHours))
     this.dates = Object.keys(this.commonFreeHours!).sort()
+
+    if (this.dates.length == 0) {
+      this.utils.notify("No common free hours have been found using this combination of users.")
+    }
   }
 
-  displayDatetime(datetime: string | number, options: Intl.DateTimeFormatOptions){
-    return new Date(datetime).toLocaleString('en-US', {...options, hour12: false})
+  displayDatetime(datetime: string | number, options: Intl.DateTimeFormatOptions) {
+    return new Date(datetime).toLocaleString('en-US', { ...options, hour12: false })
   }
 
   displayTimeDelta(seconds: number) {
