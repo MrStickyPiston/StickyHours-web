@@ -111,6 +111,11 @@ export class ZapiService {
       for (const userData of data) {
         const slot = userData.timeslots[date];
 
+        if (!slot) {
+          // Day not shared
+          continue
+        }
+
         if (!minimumDaySlots[date]) {
           minimumDaySlots[date] = slot;
         } else {
