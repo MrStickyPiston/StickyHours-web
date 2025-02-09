@@ -1,9 +1,26 @@
-<mat-form-field>
-    <mat-select [(value)]="user" placeholder="Select an user">
+<form>
+    <mat-form-field>
+        <mat-label>Users</mat-label>
 
-        @for (user of users; track $index) {
-            <mat-option value="{{user.code}}">{{user.name}}</mat-option>
-        }
+        <mat-chip-grid #chipGrid aria-label="User selection">
+            @for (user of selectedUsers; track $index) {
+            <mat-chip-row (removed)="remove(user.code)">
+                {{user.name}}
+                <button matChipRemove [attr.aria-label]="'remove ' + user">
+                    <mat-icon>cancel</mat-icon>
+                </button>
+            </mat-chip-row>
+            }
+        </mat-chip-grid>
 
-    </mat-select>
-</mat-form-field>
+        <input name="user" #userInput [(ngModel)]="user" [matChipInputFor]="chipGrid"
+            [matAutocomplete]="auto" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (input)="updateFilteredUsers()" />
+
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event); userInput.value = ''">
+            @for (user of filteredUsers; track user) {
+            <mat-option [value]="user.code">{{user.name}}</mat-option>
+            }
+        </mat-autocomplete>
+    </mat-form-field>
+</form>
