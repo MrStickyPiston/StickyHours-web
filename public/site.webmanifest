@@ -29,6 +29,6 @@
   ],
   "display": "standalone",
   "description": "Easily check for common free hours in Zermelo",
-  "theme_color": "#00CC69",
+  "background_color": "#00CC69",
   "start_url": "/lastused"
 }
