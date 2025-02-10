@@ -73,10 +73,27 @@ export class ZapiService {
 
 
   getCommonGaps(data: ProcessedAppointments[], stickyHours: number): { [date: string]: Gap[] } {
-    const commonDates: Set<string> = new Set(
-      data.reduce((acc, userData) => [...acc, ...userData.days], [] as string[])
-    );
-    const sortedCommonDates: string[] = [...commonDates].sort();
+    function findCommonDays(data: ProcessedAppointments[]): string[] {
+      if (data.length === 0) {
+        return [];
+      }
+    
+      // Get the days from the first object
+      let commonDays = new Set(data[0].days);
+    
+      // Iterate through the remaining objects and intersect the days
+      for (let i = 1; i < data.length; i++) {
+        commonDays = new Set([...commonDays].filter((day) => data[i].days.includes(day)));
+      }
+    
+      return Array.from(commonDays);
+    }
+    
+    const commonDates = findCommonDays(data)
+    const sortedCommonDates: string[] = commonDates.sort();
+
+    console.log(data)
+    console.log(commonDates)
 
     const mergedDays: { [date: string]: { [slot: number]: { start: number; end: number } } } = {};
 
@@ -110,11 +127,6 @@ export class ZapiService {
     for (const date of sortedCommonDates) {
       for (const userData of data) {
         const slot = userData.timeslots[date];
-
-        if (!slot) {
-          // Day not shared
-          continue
-        }
 
         if (!minimumDaySlots[date]) {
           minimumDaySlots[date] = slot;
