@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, Injectable } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -10,9 +11,15 @@ export class UtilsService {
 
   private readonly dialog = inject(MatDialog);
 
-  constructor() { }
+  constructor(
+  ) { }
 
   error(e: Error, errorSource: string, alert_user: boolean = false) {
+    if (e instanceof HttpErrorResponse && e.status == 401) {
+      // session expired, handled before
+      return
+    }
+
     console.error(`Unexpected error from ${errorSource}`, e)
 
     if (alert_user){

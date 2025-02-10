@@ -8,6 +8,7 @@ import { Student } from '../../types/users/student';
 import { User } from '../../types/users/user';
 import { ZermeloUser } from '../../types/zermelo-user';
 import { Appointment } from '../../types/appointment/appointment';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class ZermeloService {
 
   constructor(
     private http: HttpClient,
+    private router: Router,
     private utils: UtilsService
   ) { }
 
@@ -126,6 +128,8 @@ export class ZermeloService {
 
   async logout(instance: string) {
     console.log(`Logging out ${instance}`)
+    this.clearToken(instance)
+    this.router.navigate([instance, 'login'])
     // TODO: log out
   }
 
@@ -224,10 +228,10 @@ export class ZermeloService {
         this.utils.notify("Your current session has been exipred. Please log in again", "Session expired")
         this.logout(instance)
 
-        return null
-      } else {
-        throw e
       }
+      
+      throw e
+
     }
   }
 
@@ -239,11 +243,11 @@ export class ZermeloService {
       this.buildHttpParams(instance)
     )
 
-    return (r?.body as {response: {data: [Object]}}).response.data[0] as ZermeloUser
+    return (r?.body as { response: { data: [Object] } }).response.data[0] as ZermeloUser
   }
 
   async getSettings(instance: string): Promise<SchoolFunctionSettings | null> {
-    function getSchoolYear(){
+    function getSchoolYear() {
       const month = new Date().getMonth()
 
       if (month < 8) {
@@ -255,7 +259,7 @@ export class ZermeloService {
 
     const user = await this.getUser(instance)
 
-    return ((await this.sendGetRequest(instance, 'schoolfunctionsettings', this.buildHttpParams(instance, {archived: 'false', year: getSchoolYear().toString(), schoolInSchoolYear: user.schoolInSchoolYears.map(String).join(',')})))?.body as {response: {data: [Object]}}).response.data[0] as SchoolFunctionSettings
+    return ((await this.sendGetRequest(instance, 'schoolfunctionsettings', this.buildHttpParams(instance, { archived: 'false', year: getSchoolYear().toString(), schoolInSchoolYear: user.schoolInSchoolYears.map(String).join(',') })))?.body as { response: { data: [Object] } }).response.data[0] as SchoolFunctionSettings
   }
 
   // Utils
@@ -265,7 +269,7 @@ export class ZermeloService {
 
     if (zermeloUser.isStudent && !settings!.studentCanViewProjectSchedules) {
       return null
-    } else if (!settings!.employeeCanViewProjectSchedules){
+    } else if (!settings!.employeeCanViewProjectSchedules) {
       return null
     }
 
@@ -291,9 +295,9 @@ export class ZermeloService {
       'start': Math.floor(start.getTime() / 1000),
       'end': Math.floor(end.getTime() / 1000)
     })
-    
+
     try {
-      return (( await this.sendGetRequest(instance, 'appointments', params))?.body as {response: {data: [Appointment]}}).response.data as Appointment[]
+      return ((await this.sendGetRequest(instance, 'appointments', params))?.body as { response: { data: [Appointment] } }).response.data as Appointment[]
     } catch (err) {
       const e = err as HttpErrorResponse
 
@@ -306,14 +310,14 @@ export class ZermeloService {
     }
   }
 
-  async getUsers(instance: string){
+  async getUsers(instance: string) {
 
     const user = await this.getUser(instance)
     const settings = await this.getSettings(instance)
 
     if (user.isStudent && !settings!.studentCanViewProjectSchedules) {
       return null
-    } else if (!settings!.employeeCanViewProjectSchedules || !settings!.employeeCanViewProjectSchedules){
+    } else if (!settings!.employeeCanViewProjectSchedules || !settings!.employeeCanViewProjectSchedules) {
       return null
     }
 
@@ -321,7 +325,7 @@ export class ZermeloService {
 
     const useStudentNames = (!user.isStudent && settings?.employeeCanViewOwnSchedule) || settings?.studentCanViewProjectNames
 
-    if ( useStudentNames ) {
+    if (useStudentNames) {
       student_params = this.buildHttpParams(instance, {
         'schoolInSchoolYear': settings?.schoolInSchoolYear!,
         'isStudent': 'true',
@@ -346,8 +350,8 @@ export class ZermeloService {
     let students: Student[]
     let teachers: Teacher[]
 
-    students = (( await this.sendGetRequest(instance, 'users', student_params))?.body as {response: {data: [Student]}}).response.data    
-    teachers = (( await this.sendGetRequest(instance, 'users', teacher_params))?.body as {response: {data: [Teacher]}}).response.data
+    students = ((await this.sendGetRequest(instance, 'users', student_params))?.body as { response: { data: [Student] } }).response.data
+    teachers = ((await this.sendGetRequest(instance, 'users', teacher_params))?.body as { response: { data: [Teacher] } }).response.data
 
     teachers.forEach((teacher: Teacher) => {
       users_teachers.push(
@@ -360,7 +364,7 @@ export class ZermeloService {
     });
 
     students.forEach((student: Student) => {
-      if (useStudentNames){
+      if (useStudentNames) {
         users_students.push(
           {
             name: student.prefix ? `${student.firstName} ${student.prefix} ${student.lastName} (${student.code})` : `${student.firstName} ${student.lastName} (${student.code})`,
@@ -379,7 +383,7 @@ export class ZermeloService {
       }
     });
 
-    let users: User[] = [...users_teachers.sort((a, b) => a.name.localeCompare(b.name)), ... users_students.sort((a, b) => a.name.localeCompare(b.name))]
+    let users: User[] = [...users_teachers.sort((a, b) => a.name.localeCompare(b.name)), ...users_students.sort((a, b) => a.name.localeCompare(b.name))]
 
     return users
   }

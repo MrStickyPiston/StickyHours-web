@@ -120,7 +120,7 @@ export class AppMainComponent {
 
     this.processing = false
 
-    if (this.dates.length == 0) {
+    if (this.dates.length == 0 && await this.zermelo.isLoggedIn(this.route_instance!)) {
       this.utils.notify("No common free hours have been found using this combination of users.")
     }
   }
