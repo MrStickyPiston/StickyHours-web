@@ -11,9 +11,15 @@
                 </button>
             </mat-chip-row>
             }
+
+            @if (loading) {
+            <mat-chip-row>
+                Loading...
+            </mat-chip-row>
+            }
         </mat-chip-grid>
 
-        <input name="user" #userInput [(ngModel)]="user" [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
+        <input id="user-input" name="user" #userInput [(ngModel)]="user" [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
             (input)="updateFilteredUsers()" />
 
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="userSelected($event); userInput.value = ''">
@@ -45,7 +51,7 @@
         </mat-select>
     </mat-form-field>
 
-    <button mat-flat-button color="primary" (click)="submit()">Compute</button>
+    <button mat-flat-button color="primary" (click)="submit()" [disabled]="processing">Compute</button>
 </form>
 
 @if (dates) {
@@ -76,4 +82,6 @@
     </mat-expansion-panel>
     }
 </mat-accordion>
+} @else if (processing) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }

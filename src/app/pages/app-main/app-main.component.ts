@@ -14,10 +14,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { ZapiService } from '../../services/zapi/zapi.service';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { Gap } from '../../types/appointment/gap';
+import {MatProgressBarModule} from '@angular/material/progress-bar'; 
 
 @Component({
   selector: 'app-app-main',
-  imports: [MatFormFieldModule, MatSelectModule, MatAutocompleteModule, FormsModule, MatInputModule, MatChipsModule, MatIconModule, MatButtonModule, MatExpansionModule],
+  imports: [MatFormFieldModule, MatSelectModule, MatAutocompleteModule, FormsModule, MatInputModule, MatChipsModule, MatIconModule, MatButtonModule, MatExpansionModule, MatProgressBarModule],
   templateUrl: './app-main.component.html',
   styleUrl: './app-main.component.scss'
 })
@@ -51,6 +52,10 @@ export class AppMainComponent {
   commonFreeHours!: { [date: string]: Gap[]; } | null
   dates!: string[]
 
+  // State variables
+  loading = true
+  processing = false
+
   updateFilteredUsers() {
     const currentUser = this.user?.toLowerCase();
 
@@ -80,6 +85,7 @@ export class AppMainComponent {
     const zermeloUserCode = (await this.zermelo.getUser(this.route_instance!)).code
     this.addSelectedUser(this.allUsers!.find(user => user.code === zermeloUserCode)!)
 
+    this.loading = false
   }
 
   removeSelectedUser(userCode: string): void {
@@ -104,8 +110,15 @@ export class AppMainComponent {
 
   async submit() {
     console.log(`Computing common free hours for ${JSON.stringify(this.selectedUsers)}`)
+    this.processing = true
+    this.dates = null!
+
     this.commonFreeHours = await this.zapi.getCommonFreeHours(this.route_instance!, this.selectedUsers, Number(this.weeks), Number(this.stickyHours))
-    this.dates = Object.keys(this.commonFreeHours!).sort()
+    if (this.commonFreeHours != null) {
+      this.dates = Object.keys(this.commonFreeHours!).sort()
+    }
+
+    this.processing = false
 
     if (this.dates.length == 0) {
       this.utils.notify("No common free hours have been found using this combination of users.")
