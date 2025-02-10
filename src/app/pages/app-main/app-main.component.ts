@@ -110,6 +110,9 @@ export class AppMainComponent {
 
   async submit() {
     console.log(`Computing common free hours for ${JSON.stringify(this.selectedUsers)}`)
+
+    this.zermelo.setLastInstance(this.route_instance!)
+    
     this.processing = true
     this.dates = null!
 
