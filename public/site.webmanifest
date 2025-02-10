@@ -15,8 +15,18 @@
       "purpose": "any maskable"
     }
   ],
-  "theme_color": "#00cc69",
-  "background_color": "#00cc69",
-  "display": "fullscreen",
+  "screenshots": [
+    {
+      "src": "/images/screenshot-desktop.png",
+      "sizes": "2560x1386",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/images/screenshot-mobile.png",
+      "sizes": "1080x2340",
+      "form_factor": "narrow"
+    }
+  ],
+  "display": "standalone",
   "start_url": "/lastused"
 }

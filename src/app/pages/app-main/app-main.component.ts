@@ -79,6 +79,9 @@ export class AppMainComponent {
       console.log(`Logged in on ${this.route_instance}`)
     }
 
+    // This instance has a valid token and is opened
+    this.zermelo.setLastInstance(this.route_instance!)
+
     this.allUsers = await this.zermelo.getUsers(this.route_instance!)
     this.updateFilteredUsers()
 
@@ -110,8 +113,6 @@ export class AppMainComponent {
 
   async submit() {
     console.log(`Computing common free hours for ${JSON.stringify(this.selectedUsers)}`)
-
-    this.zermelo.setLastInstance(this.route_instance!)
     
     this.processing = true
     this.dates = null!

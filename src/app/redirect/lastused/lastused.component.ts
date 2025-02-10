@@ -16,7 +16,7 @@ export class LastusedComponent {
     if (zermelo.getLastInstance()){
       this.router.navigate([zermelo.getLastInstance()])
     } else {
-      this.router.navigate([])
+      this.router.navigate([''])
     }
   }
 }
