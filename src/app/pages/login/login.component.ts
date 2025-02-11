@@ -95,6 +95,7 @@ export class LoginComponent {
   }
 
   openInstanceidDialog() {
+    if (this)
     this.dialog.open(DialogInstanceid, {});
   }
 

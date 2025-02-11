@@ -1,6 +1,16 @@
 <form>
 
+    <!-- 
+        Reversed order because HTML selects the first button as the form submit on enter button.
+        When not reversed this makes the first button the dialog button, and that is unintuitive.
+        In the css this is done by setting the display of the form to flex and the flex direction to column-reverse.
+    -->
+
     @if (!route_instance) {
+        <button mat-flat-button color="secondary" (click)="next()">Next</button>
+
+        <br>
+
         <mat-form-field>
             <mat-label>Instance id</mat-label>
             <input matInput id="instance-id" [(ngModel)]="instance" [ngModelOptions]="{standalone: true}" required [matAutocomplete]="auto">
@@ -15,13 +25,14 @@
                 <mat-icon>help</mat-icon>
             </button>
         </mat-form-field>
+    } @else {
+
+        <button mat-flat-button color="primary" (click)="submit()">Login</button>
+        <mat-checkbox [(ngModel)]="remember_token" [ngModelOptions]="{standalone: true}">Stay logged in</mat-checkbox>
 
         <br>
 
-        <button mat-flat-button color="secondary" (click)="next()">Next</button>
-    } @else {
-
-        <mat-form-field (keydown.enter)="submit()">
+        <mat-form-field>
             <mat-label>Linkcode</mat-label>
             <input matInput id="linkcode" type="password" [(ngModel)]="linkcode" [ngModelOptions]="{standalone: true}" required>
 
@@ -29,11 +40,6 @@
                 <mat-icon>help</mat-icon>
             </button>
         </mat-form-field>
-
-        <br>
-
-        <mat-checkbox [(ngModel)]="remember_token" [ngModelOptions]="{standalone: true}">Stay logged in</mat-checkbox>
-        <button mat-flat-button color="primary" (click)="submit()">Login</button>
     }
 
 </form>
