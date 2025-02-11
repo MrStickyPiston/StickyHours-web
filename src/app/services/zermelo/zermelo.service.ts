@@ -228,10 +228,8 @@ export class ZermeloService {
 
       return await lastValueFrom(this.http.get(url, { observe: 'response', params: params }))
 
-    } catch (err) {
-      const e = err as HttpErrorResponse
-
-      if (e.status == 401) {
+    } catch (e) {
+      if (e instanceof HttpErrorResponse && e.status == 401) {
         // session expired
         this.utils.notify("Your current session has been exipred. Please log in again", "Session expired")
         this.logout(instance)
@@ -239,7 +237,6 @@ export class ZermeloService {
       }
       
       throw e
-
     }
   }
 
