@@ -9,8 +9,6 @@
     @if (!route_instance) {
         <button mat-flat-button color="secondary" (click)="next()">Next</button>
 
-        <br>
-
         <mat-form-field>
             <mat-label>Instance id</mat-label>
             <input matInput id="instance-id" [(ngModel)]="instance" [ngModelOptions]="{standalone: true}" required [matAutocomplete]="auto">
@@ -27,10 +25,8 @@
         </mat-form-field>
     } @else {
 
-        <button mat-flat-button color="primary" (click)="submit()">Login</button>
+        <button mat-flat-button color="secondary" (click)="submit()">Login</button>
         <mat-checkbox [(ngModel)]="remember_token" [ngModelOptions]="{standalone: true}">Stay logged in</mat-checkbox>
-
-        <br>
 
         <mat-form-field>
             <mat-label>Linkcode</mat-label>
