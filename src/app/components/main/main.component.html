@@ -3,6 +3,9 @@
         <mat-card-header>
             <mat-card-title>
                 <h1>Sticky Hours</h1>
+                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Options menu">
+                    <mat-icon>settings</mat-icon>
+                </button>
             </mat-card-title>
         </mat-card-header>
         <mat-card-content>
@@ -10,3 +13,17 @@
         </mat-card-content>
     </mat-card>
 </div>
+
+<mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="manageInstances()">
+        <mat-icon>domain_add</mat-icon>
+        <span>Change/add instance</span>
+    </button>
+
+    @if (getCurrentInstance()) {
+        <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Log out current instance ({{getCurrentInstance()}})</span>
+        </button>
+    }
+</mat-menu>

@@ -77,6 +77,7 @@ export class AppMainComponent {
       return
     } else {
       console.log(`Logged in on ${this.route_instance}`)
+      this.zermelo.currentInstance = this.route_instance!
     }
 
     // This instance has a valid token and is opened

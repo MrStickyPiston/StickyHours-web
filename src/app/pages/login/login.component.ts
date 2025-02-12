@@ -53,6 +53,8 @@ export class LoginComponent {
     if (await this.zermelo.isLoggedIn(this.route_instance!)){
       console.log("Already logged in on route, navigating to main page for this instance.")
       this.router.navigate([this.route_instance])
+    } else {
+      this.zermelo.currentInstance = null!
     }
   }
 

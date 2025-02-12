@@ -9,8 +9,21 @@
     width: 100%;
     height: 100%;
     max-width: max(620px, 66%);
-    
+
     h1 {
         align-self: center;
     }
+}
+
+mat-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+::ng-deep {
+    .mat-mdc-card-header-text {
+        width: 100%;
+    }
+
 }

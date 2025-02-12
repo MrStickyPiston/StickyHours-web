@@ -201,6 +201,8 @@ export class ZermeloService {
     return localStorage.getItem('lastInstance')
   }
 
+  currentInstance!: string;
+
   // Tokens
   clearToken(instance: string) {
     localStorage.removeItem(`token_${instance}`)
