@@ -121,6 +121,7 @@ export class DialogInstanceid { }
 @Component({
   selector: 'dialog-linkcode',
   templateUrl: 'dialogs/linkcode.html',
+  styles: 'img {width: 100%;}',
   imports: [MatDialogModule, MatButtonModule],
 })
 export class DialogLinkcode {
