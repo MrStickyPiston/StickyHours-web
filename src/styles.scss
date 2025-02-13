@@ -29,3 +29,9 @@ body {
 .panel mat-option.mdc-list-item--selected {
   color-scheme: dark;
 }
+
+// Fix mat autocomplete over dialog
+// https://stackoverflow.com/questions/52203275/mat-select-options-showing-behind-the-dialog
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+  z-index: 99999 !important;
+}
