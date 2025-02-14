@@ -113,12 +113,7 @@ export class ZermeloService {
 
       }
 
-      if (e instanceof Error) {
-
-        this.utils.error(e, "token check", true)
-      }
-
-      return false;
+      throw e
     }
   }
 
