@@ -18,7 +18,7 @@ export class UtilsService {
     if (e instanceof HttpErrorResponse && e.status == 401) {
       // handled before
       return
-    } else if (e instanceof HttpErrorResponse && e.status == 0) {
+    } else if (e instanceof HttpErrorResponse && (e.status == 0 || e.status == 504)) {
       this.notify("Could not reach the zermelo servers. Please make sure you are connected to the internet and the zermelo servers are online.", "Connection failed")
       console.error(`Could not reach the zermelo servers`)
       return
