@@ -76,11 +76,6 @@ export class LoginComponent {
 
   async submit() {
 
-    if (!await this.zermelo.isValidInstance(this.route_instance!)) {
-      this.utils.notify("The instance id is incorrect or the Zermelo servers are having issues. Please check if you spelled it correctly, and if you dont know what to fill in please click on the help button on the right of the field.", "Invalid instance id")
-      return
-    }
-
     if (!this.linkcode) {
       this.utils.notify("If you dont know what to fill in please click on the help button.", "Please fill in the linkcode")
       return

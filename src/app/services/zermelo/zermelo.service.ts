@@ -61,16 +61,11 @@ export class ZermeloService {
           // when the linkcode is expired
 
           return false;
-        } else {
-          this.utils.error(e, "code login", true)
         }
-      } else {
-        this.utils.notify('Could not reach the zermelo servers');
-        return false
       }
-
-      this.utils.error(e as Error, "code login", true)
-      return false
+        
+      this.utils.error(e as Error, "code login", true);
+      throw e
     }
   }
 
@@ -113,12 +108,8 @@ export class ZermeloService {
 
       }
 
-      if (e instanceof Error) {
-
-        this.utils.error(e, "token check", true)
-      }
-
-      return false;
+      this.utils.error(e as Error, "token check", true);
+      throw e
     }
   }
 
@@ -157,15 +148,10 @@ export class ZermeloService {
           return false
         }
 
-        this.utils.error(e, "instance id check http request", true)
-
-      } else if (e instanceof Error) {
-
-        this.utils.error(e, "instance id check", true)
-
       }
 
-      return false;
+      this.utils.error(e as Error, "instance id check", true)
+      throw e
     }
   }
 

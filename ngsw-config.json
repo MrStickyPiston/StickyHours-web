@@ -26,5 +26,15 @@
         ]
       }
     }
+  ],
+  "dataGroups": [
+    {
+      "name": "zermelo-api",
+      "urls": ["*.zportal.nl/api/"],
+      "cacheConfig": {
+        "maxSize": 100,
+        "maxAge": "15m"
+      }
+    }
   ]
 }

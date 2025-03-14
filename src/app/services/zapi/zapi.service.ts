@@ -201,7 +201,7 @@ export class ZapiService {
         const appointments = await this.zermelo.getSchedule(user, instance, weeks)
 
         if (!appointments || Object.keys(appointments).length === 0) {
-          this.utils.notify("Please check if you can see your schedule in Zermelo.", "No appointments found")
+          this.utils.notify(`No appointments found for ${user.name}. Please check if you can see your schedule in Zermelo.`, "No appointments found")
           return null
         }
 

@@ -119,13 +119,16 @@ export class AppMainComponent {
     this.dates = null!
 
     this.commonFreeHours = await this.zapi.getCommonFreeHours(this.route_instance!, this.selectedUsers, Number(this.weeks), Number(this.stickyHours))
-    if (this.commonFreeHours != null) {
-      this.dates = Object.keys(this.commonFreeHours!).sort()
-    }
 
     this.processing = false
 
-    if (this.dates.length == 0 && await this.zermelo.isLoggedIn(this.route_instance!)) {
+    if (this.commonFreeHours == null) {
+      return
+    }
+    
+    this.dates = Object.keys(this.commonFreeHours!).sort()
+
+    if (this.dates == null && await this.zermelo.isLoggedIn(this.route_instance!)) {
       this.utils.notify("No common free hours have been found using this combination of users.")
     }
   }
