@@ -283,14 +283,9 @@ export class ZermeloService {
     let params = this.buildHttpParams(instance, {
       'fields': 'groups,start,end,startTimeSlot,endTimeSlot,teachers',
       'valid': 'true',
-      'cancelled': 'false'
+      'cancelled': 'false',
+      'user': user.code
     })
-
-    if (!user.isTeacher) {
-      params = params.append('possibleStudents', user.code)
-    } else {
-      params = params.append('teachers', user.code)
-    }
 
     // Date and time
     const now = new Date();
